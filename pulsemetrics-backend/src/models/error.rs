@@ -38,7 +38,7 @@ pub enum AppError {
 
 impl AppError {
     /// Get HTTP status code for this error
-    fn status_code(&self) -> StatusCode {
+    pub fn status_code(&self) -> StatusCode {
         match self {
             AppError::BadRequest(_) => StatusCode::BAD_REQUEST,
             AppError::Unauthorized(_) => StatusCode::UNAUTHORIZED,
