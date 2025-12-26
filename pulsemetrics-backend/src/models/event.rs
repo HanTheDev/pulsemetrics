@@ -37,7 +37,7 @@ pub struct Event {
 #[derive(Debug, Clone, Serialize, Deserialize, Validate)]
 pub struct EventBatch {
     #[validate(length(min = 1, max = 1000))]
-    #[validate]
+    #[validate(nested)]
     pub events: Vec<Event>,
 }
 
