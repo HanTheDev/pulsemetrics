@@ -1,5 +1,4 @@
 use axum::{
-    body::Body,
     extract::Request,
     middleware::Next,
     response::Response,
