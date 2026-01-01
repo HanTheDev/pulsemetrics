@@ -1,6 +1,6 @@
 # PulseMetrics
 
-**Real-time analytics that doesn't make you wait**
+**Real-time analytics that doesn't make you wait and exclusively matter**
 
 ## Overview
 PulseMetrics is a high-performance analytics platform designed for modern SaaS engineering teams. It provides sub-second query latency on massive event data streams without the enterprise price tag.

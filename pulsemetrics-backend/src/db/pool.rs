@@ -15,17 +15,13 @@ pub async fn create_pool(config: &DatabaseConfig) -> anyhow::Result<PgPool> {
         .min_connections(config.min_connections)
         .acquire_timeout(Duration::from_secs(config.connect_timeout_seconds))
         .idle_timeout(Duration::from_secs(config.idle_timeout_seconds))
-        // Test connections before acquiring
         .test_before_acquire(true)
-        // Enable statement caching for performance
         .after_connect(|conn, _meta| {
             Box::pin(async move {
-                // Set statement timeout to 30 seconds
                 sqlx::query("SET statement_timeout = '30s'")
                     .execute(&mut *conn)
                     .await?;
 
-                // Set timezone to UTC
                 sqlx::query("SET timezone = 'UTC'")
                     .execute(&mut *conn)
                     .await?;
@@ -41,13 +37,36 @@ pub async fn create_pool(config: &DatabaseConfig) -> anyhow::Result<PgPool> {
     Ok(pool)
 }
 
-/// Run database migrations
+/// Run database migrations at runtime by reading SQL file
 pub async fn run_migrations(pool: &PgPool) -> anyhow::Result<()> {
     tracing::info!("Running database migrations");
 
-    sqlx::migrate!("./migrations")
-        .run(pool)
-        .await?;
+    // Include the SQL file at compile time
+    let migration_sql = include_str!("../../migrations/001_initial_schema.sql");
+    
+    // Execute the entire migration as a single transaction
+    let mut tx = pool.begin().await?;
+    
+    // Split by semicolon and execute each statement
+    let statements: Vec<&str> = migration_sql
+        .split(';')
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty() && !s.starts_with("--"))
+        .collect();
+
+    for (idx, statement) in statements.iter().enumerate() {
+        tracing::debug!("Executing migration statement {}/{}", idx + 1, statements.len());
+        
+        sqlx::query(statement)
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| {
+                tracing::error!("Failed to execute statement: {}", statement);
+                anyhow::anyhow!("Migration failed at statement {}: {}", idx + 1, e)
+            })?;
+    }
+
+    tx.commit().await?;
 
     tracing::info!("Database migrations completed successfully");
 

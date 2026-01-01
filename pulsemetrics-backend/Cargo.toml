@@ -5,28 +5,27 @@ edition = "2021"
 
 [dependencies]
 # Web framework
-axum = { version = "0.7", features = ["macros", "ws"] }
-tokio = { version = "1", features = ["full"] }
-tower = { version = "0.4", features = ["util"] }
-tower-http = { version = "0.5", features = ["trace", "cors", "compression-gzip"] }
+axum = { version = "0.8.8", features = ["macros", "ws"] }
+tokio = { version = "1.35", features = ["full"] }
+tower = { version = "0.5.2", features = ["util"] }
+tower-http = { version = "0.6.8", features = ["trace", "cors", "compression-gzip"] }
 
 # Database
-sqlx = { version = "0.7", features = [
+sqlx = { version = "0.8.6", features = [
     "runtime-tokio-rustls",
     "postgres",
     "uuid",
     "chrono",
     "json",
     "migrate"
-] }
-deadpool-postgres = "0.12"
+], default-features = false }
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
 # Error handling
-thiserror = "1.0"
+thiserror = "2.0.17"
 anyhow = "1.0"
 
 # Observability
@@ -37,14 +36,14 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 uuid = { version = "1.6", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 dotenvy = "0.15"
-validator = { version = "0.18", features = ["derive"] }
+validator = { version = "0.20.0", features = ["derive"] }
 
 # Async utilities
 tokio-util = "0.7"
 futures = "0.3"
 
 [dev-dependencies]
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.12.28", features = ["json"] }
 tokio-test = "0.4"
 
 [profile.release]
